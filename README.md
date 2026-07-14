@@ -3,7 +3,7 @@
 React frontend for entering an address, getting turn-by-turn directions, and
 seeing the route on a map. This is a plain REST client - it has no geodata,
 routing, or geocoding logic of its own. All of that lives in the separate
-[`route-directions-service`](../route-directions-service) backend.
+[`route_directions_service`](../route_directions_service) backend.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ routing, or geocoding logic of its own. All of that lives in the separate
   GeoJSON layers on top, sourced from the backend's response.
 - **`src/api/client.ts`** is the only place that talks to the backend -
   three calls: `geocode`, `reverseGeocode`, `getDirections`, all hitting
-  `route-directions-service`'s `/api/*` endpoints.
+  `route_directions_service`'s `/api/*` endpoints.
 - **Geocoding provider selector** (`App.tsx`): a dropdown lets the user pick
   which of the backend's three geocoding backends (PostGIS trigram search,
   Photon, Nominatim) handles address autocomplete, so they can be compared
@@ -26,7 +26,7 @@ routing, or geocoding logic of its own. All of that lives in the separate
 
 ```
 ┌──────────────────────┐        /api/geocode
-│  route_directions_ui │ ─────  /api/reverse-geocode  ──▶  route-directions-service
+│  route_directions_ui │ ─────  /api/reverse-geocode  ──▶  route_directions_service
 │  (this repo)          │       /api/directions               (separate repo)
 └──────────────────────┘
 ```
@@ -34,10 +34,10 @@ routing, or geocoding logic of its own. All of that lives in the separate
 ## Geodata
 
 This project doesn't load or store any geodata itself - it just renders
-whatever `route-directions-service` returns. Before addresses/directions will
+whatever `route_directions_service` returns. Before addresses/directions will
 resolve to anything real, the backend needs its OpenStreetMap-derived data
 loaded (PostGIS addresses table, GraphHopper routing graph, Nominatim and
-Photon indexes). See **`route-directions-service`'s README, "One-time data
+Photon indexes). See **`route_directions_service`'s README, "One-time data
 setup"** section for those steps - this repo has nothing to do until that's
 done.
 
@@ -49,7 +49,7 @@ npm run dev
 ```
 
 Opens on `http://localhost:5173`. By default it talks to a
-`route-directions-service` backend at `http://localhost:8090`; override with:
+`route_directions_service` backend at `http://localhost:8090`; override with:
 
 ```bash
 VITE_API_BASE_URL=http://localhost:8090 npm run dev
@@ -70,14 +70,14 @@ Produces `dist/`. Two things to get right for a real deployment:
 
 1. **`VITE_API_BASE_URL` must be set at build time**, not runtime - Vite
    inlines `import.meta.env.*` values into the built JS. Point it at the
-   publicly reachable URL of your deployed `route-directions-service`:
+   publicly reachable URL of your deployed `route_directions_service`:
 
    ```bash
    VITE_API_BASE_URL=https://api.example.com npm run build
    ```
 
 2. **The backend's CORS must allow this site's origin.** Set
-   `route-directions-service`'s `CORS_ALLOWED_ORIGINS` env var to this site's
+   `route_directions_service`'s `CORS_ALLOWED_ORIGINS` env var to this site's
    deployed origin (e.g. `https://directions.example.com`) - its default
    only allows `http://localhost:*`, so a deployed frontend calling a
    deployed backend will otherwise fail with CORS errors in the browser
